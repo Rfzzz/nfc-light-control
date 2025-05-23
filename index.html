@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>NFC 感應開燈</title>
+  <script src="https://webduino.io/components/webduino-all.min.js"></script>
+  <script src="https://webduino.io/components/webduino-board.min.js"></script>
+  <script src="https://webduino.io/components/webduino-led.min.js"></script>
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="welcome">歡迎</h1>
+  <button onclick="ledOn()">開燈</button>
+  <button onclick="ledOff()">關燈</button>
+
+  <script>
+    // 取得 URL 參數
+    function getUrlParams() {
+      const params = {};
+      const queryString = window.location.search.substring(1);
+      const pairs = queryString.split("&");
+      for (let i = 0; i < pairs.length; i++) {
+        const pair = pairs[i].split("=");
+        params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || "");
+      }
+      return params;
+    }
+
+    // 初始化 Webduino
+    const board = new webduino.Board('YdrMW');
+    let led;
+
+    board.on('ready', function() {
+      led = new webduino.module.Led(board, board.getDigitalPin(2)); // D2 預設燈腳位
+      const params = getUrlParams();
+
+      // 顯示歡迎訊息
+      document.getElementById("welcome").innerText = "歡迎 " + (params.name || "訪客");
+
+      // 根據 light 參數開關燈
+      if (params.light === "on") {
+        led.on();
+      } else if (params.light === "off") {
+        led.off();
+      }
+    });
+
+    // 按鈕控制函式
+    function ledOn() {
+      if (led) led.on();
+    }
+
+    function ledOff() {
+      if (led) led.off();
+    }
+  </script>
+</body>
+</html>
